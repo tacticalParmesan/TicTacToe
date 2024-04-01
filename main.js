@@ -64,6 +64,8 @@ const gameManager = (function () {
 
 		createLogicBoard();
 		console.info("Created a new empty board:");
+        UI.createUIBoard();
+        console.info("Created UI board.")
 		UI.body.removeChild(UI.startButton);
 	}
 
@@ -87,9 +89,20 @@ const UI = (function () {
         boardContainer.classList.add("board-container");
 
         // TODO: Create board with for loop
+        for(let i = 0; i < 3; i++){
+            for(let j = 0; j < 3; j++) {
+                const newSpot = document.createElement("div");
+                newSpot.classList.add("board-spot");
+                newSpot.setAttribute("row", i)
+                newSpot.setAttribute("col", j)
+                boardContainer.appendChild(newSpot)
+            }
+        }
+
+        body.appendChild(boardContainer)
     }
 
-	return { body, startButton };
+	return { body, startButton, createUIBoard };
 })();
 
 
