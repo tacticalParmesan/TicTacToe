@@ -15,14 +15,12 @@ const Gameboard = (function () {
 	}
 
 	function updateBoard(mark, row, column) {
-		// Checks if the spot is not occupied before placing the mark;
-		if (!board[row][column]) {
-			board[row][column] = mark; // TODO: Remember to pass the turn only when the mark is successfully placed!
-		} else {
-			alert("This spot is not empty!");
-		}
+		board[row][column] = mark; // TODO: Remember to pass the turn only when the mark is successfully placed!
+	}
 
-		printBoard();
+	function isSpotEmpty(row, column) {
+		// Checks if the spot is not occupied before placing the mark;
+		return !board[row][column] ? true : false;
 	}
 
 	function clearBoard() {
@@ -35,11 +33,11 @@ const Gameboard = (function () {
 		printBoard();
 	}
 
-    function getBoard() {
-        return board;
-    }
+	function getBoard() {
+		return board;
+	}
 
-	return { updateBoard, printBoard, clearBoard, getBoard };
+	return { updateBoard, printBoard, clearBoard, getBoard, isSpotEmpty };
 })();
 
 /* The Players are stored each in its own object with their mark; the player object
@@ -55,25 +53,52 @@ const Player = function (name, mark) {
 /* Th gameManager controls the game flow and interacts with the players, the board and
 the displayControllor to update the game and provide feedback. */
 const gameManager = (function () {
+	let players = [];
+	let currentPlayer = {};
+	let turnCount;
+
 	function startGame() {
 		// When the game starts, two players are initialized.
 		const edo = Player("edo", "X");
 		const fede = Player("fede", "O");
+		players.push(edo, fede);
 
 		console.info("Created players:", edo.name, fede.name);
 
 		createLogicBoard();
 		console.info("Created a new empty board:");
-        UI.createUIBoard();
-        console.info("Created UI board.")
+		UI.createUIBoard();
+		console.info("Created UI board.");
+		createLogicBoard();
 		UI.body.removeChild(UI.startButton);
+		currentPlayer = players[1];
+		console.log(currentPlayer);
+		updateCurrentPlayer();
+		UI.updateUIBoard();
 	}
 
 	function createLogicBoard() {
 		Gameboard.clearBoard();
 	}
 
-	return { startGame };
+	function playTurn(row, col) {
+        if(Gameboard.isSpotEmpty(row, col)) {
+            currentPlayer.placeMark(currentPlayer.mark, row, col);
+            turnCount++;
+
+            updateCurrentPlayer();
+            UI.updateUIBoard();
+        } else {
+            alert("This spot is already occupied!")
+        }
+	}
+
+	function updateCurrentPlayer() {
+		currentPlayer = currentPlayer === players[0] ? players[1] : players[0];
+		UI.turnTracker.textContent = "It's " + currentPlayer.name + "'s turn!";
+	}
+
+	return { startGame, playTurn };
 })();
 
 /* The UI component will handle interactions with the game logic, object creation and
@@ -84,25 +109,49 @@ const UI = (function () {
 	const startButton = document.querySelector("#start-game-btn");
 	startButton.addEventListener("click", gameManager.startGame);
 
+	const turnTracker = document.createElement("p");
+	turnTracker.id = "turn-tracker";
+
+	let boardUIArray = [];
+
 	function createUIBoard() {
-        const boardContainer = document.createElement("div");
-        boardContainer.classList.add("board-container");
+		const boardContainer = document.createElement("div");
+		boardContainer.classList.add("board-container");
 
-        // TODO: Create board with for loop
-        for(let i = 0; i < 3; i++){
-            for(let j = 0; j < 3; j++) {
-                const newSpot = document.createElement("div");
-                newSpot.classList.add("board-spot");
-                newSpot.setAttribute("row", i)
-                newSpot.setAttribute("col", j)
-                boardContainer.appendChild(newSpot)
-            }
-        }
+		// TODO: Create board with for loop
+		for (let i = 0; i < 3; i++) {
+			for (let j = 0; j < 3; j++) {
+				const newSpot = document.createElement("div");
+				newSpot.classList.add("board-spot");
+				newSpot.setAttribute("row", i);
+				newSpot.setAttribute("col", j);
+				boardContainer.appendChild(newSpot);
+			}
+		}
 
-        body.appendChild(boardContainer)
-    }
+		body.appendChild(boardContainer);
+		body.appendChild(turnTracker);
+		boardUIArray = document.querySelectorAll(".board-spot");
+		loadClickListeners();
+	}
 
-	return { body, startButton, createUIBoard };
+	function loadClickListeners() {
+		for (const spot of boardUIArray) {
+			const spotRow = spot.getAttribute("row");
+			const spotCol = spot.getAttribute("col");
+			spot.addEventListener("mousedown", () => {
+				gameManager.playTurn(spotRow, spotCol);
+			});
+		}
+	}
+
+	function updateUIBoard() {
+		for (const spot of boardUIArray) {
+			const spotRow = spot.getAttribute("row");
+			const spotCol = spot.getAttribute("col");
+			spot.textContent = Gameboard.getBoard()[spotRow][spotCol];
+		}
+	}
+
+	return { body, startButton, createUIBoard, turnTracker, updateUIBoard };
 })();
-
-

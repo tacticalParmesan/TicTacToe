@@ -34,4 +34,6 @@ body {
     height: 4rem;
     width: 4rem;
     background-color: aquamarine;
+
+    cursor: pointer;
 }
