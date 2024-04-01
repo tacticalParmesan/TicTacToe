@@ -55,7 +55,7 @@ the displayControllor to update the game and provide feedback. */
 const gameManager = (function () {
 	let players = [];
 	let currentPlayer = {};
-	let turnCount;
+    let turnCount = 0;
 
 	function startGame() {
 		// When the game starts, two players are initialized.
@@ -84,11 +84,11 @@ const gameManager = (function () {
 	function playTurn(row, col) {
 		if (Gameboard.isSpotEmpty(row, col)) {
 			currentPlayer.placeMark(currentPlayer.mark, row, col);
-			turnCount++;
 
 			updateCurrentPlayer();
 			UI.updateUIBoard();
 
+            turnCount++;
 			checkWinner();
 		} else {
 			alert("This spot is already occupied!");
@@ -143,9 +143,16 @@ const gameManager = (function () {
 			}
 		}
 
+        function checkTie(){
+            if(turnCount === 9){
+                alert("It's a tie.")
+            }
+        }
+
 		checkByRow();
 		checkByColumn();
         checkDiagonally();
+        checkTie()
 	}
 
 	return { startGame, playTurn };

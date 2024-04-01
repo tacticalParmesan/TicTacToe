@@ -33,7 +33,14 @@ body {
 .board-spot {
     height: 4rem;
     width: 4rem;
-    background-color: aquamarine;
+    background-color: lightcoral;
 
     cursor: pointer;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-weight: 700;
+    font-size: 1.5rem;
 }
