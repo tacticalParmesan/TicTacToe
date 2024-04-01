@@ -82,20 +82,70 @@ const gameManager = (function () {
 	}
 
 	function playTurn(row, col) {
-        if(Gameboard.isSpotEmpty(row, col)) {
-            currentPlayer.placeMark(currentPlayer.mark, row, col);
-            turnCount++;
+		if (Gameboard.isSpotEmpty(row, col)) {
+			currentPlayer.placeMark(currentPlayer.mark, row, col);
+			turnCount++;
 
-            updateCurrentPlayer();
-            UI.updateUIBoard();
-        } else {
-            alert("This spot is already occupied!")
-        }
+			updateCurrentPlayer();
+			UI.updateUIBoard();
+
+			checkWinner();
+		} else {
+			alert("This spot is already occupied!");
+		}
 	}
 
 	function updateCurrentPlayer() {
 		currentPlayer = currentPlayer === players[0] ? players[1] : players[0];
 		UI.turnTracker.textContent = "It's " + currentPlayer.name + "'s turn!";
+	}
+
+	function checkWinner() {
+		const board = Gameboard.getBoard();
+
+		function checkByRow() {
+			for (const row of board) {
+				if (row[0] === row[1] && row[1] === row[2] && row[0] !== null) {
+					const winner =
+						row[0] === players[0].mark ? players[0].name : players[1].name;
+					alert(winner + " wins the game by row!");
+				}
+			}
+		}
+
+		function checkByColumn() {
+			for (let i = 0; i < 3; i++) {
+				if (
+					board[0][i] === board[1][i] &&
+					board[1][i] === board[2][i] &&
+					board[0][i] !== null
+				) {
+					const winner =
+						board[0][i] === players[0].mark ? players[0].name : players[1].name;
+					alert(winner + " wins the game by column!");
+				}
+			}
+		}
+
+		function checkDiagonally() {
+			// Check for winner diagonally
+			if (
+				(board[0][0] === board[1][1] &&
+					board[1][1] === board[2][2] &&
+					board[1][1] !== null) ||
+				(board[0][2] === board[1][1] &&
+					board[1][1] === board[2][0] &&
+					board[1][1] !== null)
+			) {
+				const winner =
+					board[1][1] === players[0].mark ? players[0].name : players[1].name;
+				alert(winner + " wins the game by diagonal!");
+			}
+		}
+
+		checkByRow();
+		checkByColumn();
+        checkDiagonally();
 	}
 
 	return { startGame, playTurn };
