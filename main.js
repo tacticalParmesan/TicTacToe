@@ -1,25 +1,17 @@
-/* Gameboard object responsibile for taking note of the marks on the field; the board itself
-is a private variable that can be updated from the outside only with the dedicated function. */
 const Gameboard = (function () {
-	// The board itself, as a 2D array of empty values;
+	
 	let board = [
 		[, , ,],
 		[, , ,],
 		[, , ,],
 	];
 
-	// The board can be accessed only by the functions below, it takes coordinates as arguments;
-
-	function printBoard() {
-		console.log(board);
-	}
 
 	function updateBoard(mark, row, column) {
-		board[row][column] = mark; // TODO: Remember to pass the turn only when the mark is successfully placed!
+		board[row][column] = mark; 
 	}
 
 	function isSpotEmpty(row, column) {
-		// Checks if the spot is not occupied before placing the mark;
 		return !board[row][column] ? true : false;
 	}
 
@@ -29,52 +21,35 @@ const Gameboard = (function () {
 				board[i][j] = null;
 			}
 		}
-
-		printBoard();
 	}
 
 	function getBoard() {
 		return board;
 	}
 
-	return { updateBoard, printBoard, clearBoard, getBoard, isSpotEmpty };
+	return { updateBoard, clearBoard, getBoard, isSpotEmpty };
 })();
 
-/* The Players are stored each in its own object with their mark; the player object
-can place the mark on the board accessing the board Object. */
-const Player = function (name, mark) {
-	function placeMark(mark, row, column) {
-		Gameboard.updateBoard(mark, row, column);
-	}
+const GameController = (function () {
 
-	return { name, mark, placeMark };
-};
-
-/* Th gameManager controls the game flow and interacts with the players, the board and
-the displayControllor to update the game and provide feedback. */
-const gameManager = (function () {
 	let players = [];
 	let currentPlayer = {};
     let turnCount = 0;
 
 	function startGame() {
-		// When the game starts, two players are initialized.
+
+		// Players initialization
 		const edo = Player("edo", "X");
 		const fede = Player("fede", "O");
 		players.push(edo, fede);
-
-		console.info("Created players:", edo.name, fede.name);
-
-		createLogicBoard();
-		console.info("Created a new empty board:");
-		UI.createUIBoard();
-		console.info("Created UI board.");
-		createLogicBoard();
-		UI.body.removeChild(UI.startButton);
 		currentPlayer = players[1];
-		console.log(currentPlayer);
 		updateCurrentPlayer();
-		UI.updateUIBoard();
+
+		// Gameboard initialization
+		createLogicBoard();
+		DisplayController.createUIBoard();
+		DisplayController.body.removeChild(DisplayController.startButton);
+		
 	}
 
 	function createLogicBoard() {
@@ -82,133 +57,179 @@ const gameManager = (function () {
 	}
 
 	function playTurn(row, col) {
+
 		if (Gameboard.isSpotEmpty(row, col)) {
+
+			// Current player places its mark and passes the turn
 			currentPlayer.placeMark(currentPlayer.mark, row, col);
-
 			updateCurrentPlayer();
-			UI.updateUIBoard();
 
+			// The logic check if there is a winner and moves onto the next turn
+			DisplayController.updateUIBoard();
             turnCount++;
 			checkWinner();
+
 		} else {
+
 			alert("This spot is already occupied!");
+
 		}
 	}
 
 	function updateCurrentPlayer() {
+		
+		// Changes the current player and updates the display text
 		currentPlayer = currentPlayer === players[0] ? players[1] : players[0];
-		UI.turnTracker.textContent = "It's " + currentPlayer.name + "'s turn!";
+		DisplayController.turnTracker.textContent = "It's " + currentPlayer.name + "'s turn!";
+
 	}
 
 	function checkWinner() {
+
+		// Gets a copy of the board and performs checks to see if there is a winner
 		const board = Gameboard.getBoard();
+		let winner;
 
 		function checkByRow() {
+			
 			for (const row of board) {
 				if (row[0] === row[1] && row[1] === row[2] && row[0] !== null) {
-					const winner =
+
+					winner =
 						row[0] === players[0].mark ? players[0].name : players[1].name;
-					alert(winner + " wins the game by row!");
 				}
 			}
 		}
 
 		function checkByColumn() {
+
 			for (let i = 0; i < 3; i++) {
-				if (
-					board[0][i] === board[1][i] &&
-					board[1][i] === board[2][i] &&
-					board[0][i] !== null
-				) {
-					const winner =
+				if (board[0][i] === board[1][i] && board[1][i] === board[2][i] && board[0][i] !== null) {
+
+					winner =
 						board[0][i] === players[0].mark ? players[0].name : players[1].name;
-					alert(winner + " wins the game by column!");
 				}
 			}
 		}
 
 		function checkDiagonally() {
-			// Check for winner diagonally
+
 			if (
-				(board[0][0] === board[1][1] &&
-					board[1][1] === board[2][2] &&
-					board[1][1] !== null) ||
-				(board[0][2] === board[1][1] &&
-					board[1][1] === board[2][0] &&
-					board[1][1] !== null)
-			) {
-				const winner =
+				(board[0][0] === board[1][1] &&	board[1][1] === board[2][2] && board[1][1] !== null) ||
+				(board[0][2] === board[1][1] &&	board[1][1] === board[2][0] && board[1][1] !== null)) {
+
+				winner =
 					board[1][1] === players[0].mark ? players[0].name : players[1].name;
-				alert(winner + " wins the game by diagonal!");
 			}
 		}
 
         function checkTie(){
-            if(turnCount === 9){
+
+			// Checks is there is no winner and the maximun of turns has passed (9)
+            if(turnCount === 9 && !winner){
                 alert("It's a tie.")
             }
         }
 
-		checkByRow();
-		checkByColumn();
-        checkDiagonally();
+		function declareWinner() {
+
+			// Checks for different win conditions...
+			checkByRow();
+			checkByColumn();
+			checkDiagonally();
+
+			//...and declares a winner if there is one!
+			if(winner) alert(winner + "wins the game!")
+
+		}
+
+		declareWinner()
         checkTie()
 	}
 
 	return { startGame, playTurn };
 })();
 
-/* The UI component will handle interactions with the game logic, object creation and
-visual effects. */
-const UI = (function () {
+
+const DisplayController = (function () {
+
+	// User Interface References
 	const body = document.querySelector("body");
 
 	const startButton = document.querySelector("#start-game-btn");
-	startButton.addEventListener("click", gameManager.startGame);
+	startButton.addEventListener("click", GameController.startGame);
 
 	const turnTracker = document.createElement("p");
 	turnTracker.id = "turn-tracker";
 
-	let boardUIArray = [];
+	let boardUIArray = []; // NodeList to store the spots on the UI board
 
 	function createUIBoard() {
+
+		// 1 | Creates the grid
 		const boardContainer = document.createElement("div");
 		boardContainer.classList.add("board-container");
 
-		// TODO: Create board with for loop
+		// 2 | Creates the board one row at a time
 		for (let i = 0; i < 3; i++) {
 			for (let j = 0; j < 3; j++) {
+
 				const newSpot = document.createElement("div");
 				newSpot.classList.add("board-spot");
 				newSpot.setAttribute("row", i);
 				newSpot.setAttribute("col", j);
+
 				boardContainer.appendChild(newSpot);
 			}
 		}
 
+		// 3 | Appends the newly created spots to the grid and stores them in the NodeList
 		body.appendChild(boardContainer);
 		body.appendChild(turnTracker);
 		boardUIArray = document.querySelectorAll(".board-spot");
+
+		// 4 | Loops over the NodeList to attach to each an event listener that reads the spot's coordinates to interact with the logic board
 		loadClickListeners();
 	}
 
 	function loadClickListeners() {
+
+		// As per point 4 of the createUIBoard function
+
 		for (const spot of boardUIArray) {
+
 			const spotRow = spot.getAttribute("row");
 			const spotCol = spot.getAttribute("col");
+
 			spot.addEventListener("mousedown", () => {
-				gameManager.playTurn(spotRow, spotCol);
+				GameController.playTurn(spotRow, spotCol); // Every click it tied to the spots coordinates
 			});
 		}
 	}
 
 	function updateUIBoard() {
+
+		// Updates the UI displaying the marks placed in the spots
 		for (const spot of boardUIArray) {
+
+			// Does so by getting the corresponding coordinates from UI grid...
 			const spotRow = spot.getAttribute("row");
 			const spotCol = spot.getAttribute("col");
+
+			//...and sets the text value to the mark for each corresponding spot
 			spot.textContent = Gameboard.getBoard()[spotRow][spotCol];
 		}
 	}
 
 	return { body, startButton, createUIBoard, turnTracker, updateUIBoard };
 })();
+
+function Player(name, mark){
+	
+	function placeMark(mark, row, column){
+		Gameboard.updateBoard(mark, row, column)
+	}
+
+	return { name, mark, placeMark }
+
+};
