@@ -55,10 +55,10 @@ const GameController = (function () {
 
 		// Gameboard initialization
 		createLogicBoard();
-		DisplayController.createUIBoard();
+		DisplayController.boardFunctions.createUIBoard();
 
 		if(document.getElementById("start-game-btn")){
-			DisplayController.body.removeChild(DisplayController.startButton);
+			DisplayController.DOMElements.body.removeChild(DisplayController.DOMElements.startButton);
 		}
 		
 	}
@@ -76,7 +76,7 @@ const GameController = (function () {
 			updateCurrentPlayer();
 
 			// The logic check if there is a winner and moves onto the next turn
-			DisplayController.updateUIBoard();
+			DisplayController.boardFunctions.updateUIBoard();
             turnCount++;
 			checkWinner();
 
@@ -91,7 +91,7 @@ const GameController = (function () {
 		
 		// Changes the current player and updates the display text
 		currentPlayer = currentPlayer === players[0] ? players[1] : players[0];
-		DisplayController.turnTracker.textContent = "It's " + currentPlayer.name + "'s turn!";
+		DisplayController.DOMElements.turnTracker.textContent = "It's " + currentPlayer.name + "'s turn!";
 
 	}
 
@@ -162,20 +162,20 @@ const GameController = (function () {
 	function endGame(winner=undefined) {
 
 		// 1 | Disables the gameboard
-		DisplayController.disableUIBoard()
+		DisplayController.boardFunctions.disableUIBoard()
 
 		// 2 | Deletes the turn tracking text
-		DisplayController.body.removeChild(DisplayController.turnTracker)
+		DisplayController.DOMElements.body.removeChild(DisplayController.DOMElements.turnTracker)
 
 		// 3 | Displays the winner of the game
 		if(winner) {
-			DisplayController.displayWinner(winner)
+			DisplayController.displayFunctions.displayWinner(winner)
 		} else {
-			DisplayController.displayTie("It's a tie!")
+			DisplayController.displayFunctions.displayTie("It's a tie!")
 		}
 
 		// 4 | Shows result and button for restart
-		DisplayController.showRestartButton() // TODO
+		DisplayController.displayFunctions.showRestartButton() // TODO
 
 	}
 
@@ -183,7 +183,7 @@ const GameController = (function () {
 
 		// Starts a new game
 		resetGameData();
-		DisplayController.resetUIBoard();
+		DisplayController.boardFunctions.resetUIBoard();
 		startGame();
 		
 	}
@@ -301,7 +301,7 @@ const DisplayController = (function () {
 
 		const tieText = document.createElement("p");
 		tieText.id = "result-text";
-		tieText.textContent = `It's a tie!`
+		tieText.textContent = `It's a tie!`;
 
 		body.appendChild(tieText);
 	}
@@ -309,23 +309,21 @@ const DisplayController = (function () {
 	function showRestartButton() {
 		const restartButton = document.createElement("button")
 		restartButton.id = "restart-btn";
-		restartButton.textContent = "New Game?"
-		restartButton.addEventListener("mousedown", GameController.restart)
-		body.appendChild(restartButton)
+		restartButton.textContent = "New Game?";
+		restartButton.addEventListener("mousedown", GameController.restart);
+		body.appendChild(restartButton);
 	}
 
 	function resetUIBoard() {
-
 		body.removeChild(boardContainer);
 		body.removeChild(document.querySelector("#result-text"));
 		body.removeChild(document.querySelector("#restart-btn"));
 		
-		
 	}
 
-	return { body, startButton, createUIBoard, turnTracker, 
-			 updateUIBoard, disableUIBoard, enableUIBoard, displayWinner, 
-			 displayTie, showRestartButton, resetUIBoard };
+	return { DOMElements: {body, startButton, turnTracker},
+			 boardFunctions: {createUIBoard, updateUIBoard, disableUIBoard, enableUIBoard, resetUIBoard},
+			 displayFunctions: {displayWinner, displayTie, showRestartButton}  };
 })();
 
 function Player(name, mark){
