@@ -36,19 +36,30 @@ const GameController = (function () {
 	let currentPlayer = {};
     let turnCount = 0;
 
+	function getPlayers() {
+
+		const edo = Player("edo", "🐕");
+		const liuba = Player("liuba", "🐈‍⬛");
+		players.push(liuba, edo);
+
+	}
+
 	function startGame() {
 
 		// Players initialization
-		const edo = Player("edo", "X");
-		const fede = Player("fede", "O");
-		players.push(edo, fede);
+		getPlayers();
+
 		currentPlayer = players[1];
 		updateCurrentPlayer();
+		turnCount = 0;
 
 		// Gameboard initialization
 		createLogicBoard();
 		DisplayController.createUIBoard();
-		DisplayController.body.removeChild(DisplayController.startButton);
+
+		if(document.getElementById("start-game-btn")){
+			DisplayController.body.removeChild(DisplayController.startButton);
+		}
 		
 	}
 
@@ -167,7 +178,26 @@ const GameController = (function () {
 		DisplayController.showRestartButton() // TODO
 
 	}
-	return { startGame, playTurn };
+
+	function restart() {
+
+		// Starts a new game
+		resetGameData();
+		DisplayController.resetUIBoard();
+		startGame();
+		
+	}
+
+	function resetGameData() {
+
+		players = [];
+		winner = undefined;
+		turnCount = 0;
+
+	}
+
+
+	return { startGame, playTurn, restart };
 })();
 
 
@@ -175,6 +205,7 @@ const DisplayController = (function () {
 
 	// User Interface References
 	const body = document.querySelector("body");
+	let boardContainer;
 
 	const startButton = document.querySelector("#start-game-btn");
 	startButton.addEventListener("click", GameController.startGame);
@@ -187,7 +218,7 @@ const DisplayController = (function () {
 	function createUIBoard() {
 
 		// 1 | Creates the grid
-		const boardContainer = document.createElement("div");
+		boardContainer = document.createElement("div");
 		boardContainer.classList.add("board-container");
 
 		// 2 | Creates the board one row at a time
@@ -249,10 +280,18 @@ const DisplayController = (function () {
 		});
 	}
 
+	function enableUIBoard() {
+
+		// Disables the buttons, no marks can be placed anymore
+		boardUIArray.forEach( (btn) => {
+			btn.disabled = false;
+		});
+	}
+
 	function displayWinner(winnerPlayer) {
 
 		const winnerText = document.createElement("p");
-		winnerText.id = "winner-text";
+		winnerText.id = "result-text";
 		winnerText.textContent = `${winnerPlayer} wins the game!`
 
 		body.appendChild(winnerText);
@@ -261,13 +300,32 @@ const DisplayController = (function () {
 	function displayTie() {
 
 		const tieText = document.createElement("p");
-		tieText.id = "tie-text";
+		tieText.id = "result-text";
 		tieText.textContent = `It's a tie!`
 
 		body.appendChild(tieText);
 	}
 
-	return { body, startButton, createUIBoard, turnTracker, updateUIBoard, disableUIBoard, displayWinner, displayTie };
+	function showRestartButton() {
+		const restartButton = document.createElement("button")
+		restartButton.id = "restart-btn";
+		restartButton.textContent = "New Game?"
+		restartButton.addEventListener("mousedown", GameController.restart)
+		body.appendChild(restartButton)
+	}
+
+	function resetUIBoard() {
+
+		body.removeChild(boardContainer);
+		body.removeChild(document.querySelector("#result-text"));
+		body.removeChild(document.querySelector("#restart-btn"));
+		
+		
+	}
+
+	return { body, startButton, createUIBoard, turnTracker, 
+			 updateUIBoard, disableUIBoard, enableUIBoard, displayWinner, 
+			 displayTie, showRestartButton, resetUIBoard };
 })();
 
 function Player(name, mark){
