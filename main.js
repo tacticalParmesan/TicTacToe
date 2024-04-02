@@ -123,15 +123,13 @@ const GameController = (function () {
 			}
 		}
 
-        function checkTie(){
+        function isTie(){
 
 			// Checks is there is no winner and the maximun of turns has passed (9)
-            if(turnCount === 9 && !winner){
-                alert("It's a tie.")
-            }
+            if(turnCount === 9 && !winner) return true; 
         }
 
-		function declareWinner() {
+		function checkResult() {
 
 			// Checks for different win conditions...
 			checkByRow();
@@ -139,14 +137,36 @@ const GameController = (function () {
 			checkDiagonally();
 
 			//...and declares a winner if there is one!
-			if(winner) alert(winner + "wins the game!")
-
+			if(winner){
+				endGame(winner);
+			} else if (isTie()) {
+				endGame()
+			}
 		}
 
-		declareWinner()
-        checkTie()
+		checkResult();
+
 	}
 
+	function endGame(winner=undefined) {
+
+		// 1 | Disables the gameboard
+		DisplayController.disableUIBoard()
+
+		// 2 | Deletes the turn tracking text
+		DisplayController.body.removeChild(DisplayController.turnTracker)
+
+		// 3 | Displays the winner of the game
+		if(winner) {
+			DisplayController.displayWinner(winner)
+		} else {
+			DisplayController.displayTie("It's a tie!")
+		}
+
+		// 4 | Shows result and button for restart
+		DisplayController.showRestartButton() // TODO
+
+	}
 	return { startGame, playTurn };
 })();
 
@@ -174,7 +194,7 @@ const DisplayController = (function () {
 		for (let i = 0; i < 3; i++) {
 			for (let j = 0; j < 3; j++) {
 
-				const newSpot = document.createElement("div");
+				const newSpot = document.createElement("button");
 				newSpot.classList.add("board-spot");
 				newSpot.setAttribute("row", i);
 				newSpot.setAttribute("col", j);
@@ -221,7 +241,33 @@ const DisplayController = (function () {
 		}
 	}
 
-	return { body, startButton, createUIBoard, turnTracker, updateUIBoard };
+	function disableUIBoard() {
+
+		// Disables the buttons, no marks can be placed anymore
+		boardUIArray.forEach( (btn) => {
+			btn.disabled = true;
+		});
+	}
+
+	function displayWinner(winnerPlayer) {
+
+		const winnerText = document.createElement("p");
+		winnerText.id = "winner-text";
+		winnerText.textContent = `${winnerPlayer} wins the game!`
+
+		body.appendChild(winnerText);
+	}
+
+	function displayTie() {
+
+		const tieText = document.createElement("p");
+		tieText.id = "tie-text";
+		tieText.textContent = `It's a tie!`
+
+		body.appendChild(tieText);
+	}
+
+	return { body, startButton, createUIBoard, turnTracker, updateUIBoard, disableUIBoard, displayWinner, displayTie };
 })();
 
 function Player(name, mark){
