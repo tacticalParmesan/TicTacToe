@@ -3,8 +3,9 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="stylesheet" href="style.css" />
-		<script src="main.js" defer></script>
+		<link rel="stylesheet" href="./style/style.css" />
+		<link rel="stylesheet" href="./style/dialog.css">
+		<script src="./src/main.js" defer></script>
 		<title>Tic Tac Toe | Odin Project</title>
 	</head>
 	<body>
@@ -45,7 +46,10 @@
 					</select>
 				</div>
 			</form>
-			<button id="load-players-btn">Start Game</button>
+			<div class="buttons-row">
+				<button id="load-players-btn">Start Game</button>
+				<button id="close-modal">Close</button>
+			</div>
 		</dialog>
 	</body>
 </html>

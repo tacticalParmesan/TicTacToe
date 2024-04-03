@@ -30,6 +30,7 @@ const Gameboard = (function () {
 	return { updateBoard, clearBoard, getBoard, isSpotEmpty };
 })();
 
+
 const GameController = (function () {
 
 	let players = [];
@@ -201,7 +202,6 @@ const GameController = (function () {
 
 	}
 
-
 	return { getPlayers, startGame, playTurn, restart };
 })();
 
@@ -229,8 +229,6 @@ const DisplayController = (function () {
 
 	const playButton = document.querySelector("#start-game-btn");
 	playButton.addEventListener("click",() => newPlayersModal.showModal());
-
-
 	
 	const turnTracker = document.createElement("p");
 	turnTracker.id = "turn-tracker";
