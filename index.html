@@ -1,13 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <script src="main.js" defer></script>
-    <title>Tic Tac Toe | Odin Project</title>
-</head>
-<body>
-    <button id="start-game-btn">Start Game</button>
-</body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="style.css" />
+		<script src="main.js" defer></script>
+		<title>Tic Tac Toe | Odin Project</title>
+	</head>
+	<body>
+		<button id="start-game-btn">Start Game</button>
+		<dialog id="players-creation">
+			<p>Enter players name and choose their marks:</p>
+			<form action="#">
+				<div class="player-one-row">
+					<label for="player-one"
+						>Player 1:
+						<input type="text" name="player-one-name" id="player-one-name" />
+					</label>
+					<select name="player-one-mark" id="player-one-mark">
+						<option value="✖️">✖️</option>
+						<option value="⭕">⭕</option>
+						<option value="🐈">🐈</option>
+						<option value="🐕">🐕</option>
+						<option value="🌭">🌭</option>
+						<option value="🍕">🍕</option>
+						<option value="☀️">☀️</option>
+						<option value="🌑">🌑</option>
+					</select>
+				</div>
+				<div class="player-two-row">
+					<label for="player-two"
+						>Player 2:
+						<input type="text" name="player-two-name" id="player-two-name" />
+					</label>
+					<select name="player-two-mark" id="player-two-mark">
+						<option value="✖️">✖️</option>
+						<option value="⭕">⭕</option>
+						<option value="🐈">🐈</option>
+						<option value="🐕">🐕</option>
+						<option value="🌭">🌭</option>
+						<option value="🍕">🍕</option>
+						<option value="☀️">☀️</option>
+						<option value="🌑">🌑</option>
+					</select>
+				</div>
+			</form>
+			<button id="load-players-btn">Start Game</button>
+		</dialog>
+	</body>
 </html>

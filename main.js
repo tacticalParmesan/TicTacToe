@@ -36,18 +36,24 @@ const GameController = (function () {
 	let currentPlayer = {};
     let turnCount = 0;
 
+
 	function getPlayers() {
 
-		const edo = Player("edo", "🐕");
-		const liuba = Player("liuba", "🐈‍⬛");
-		players.push(liuba, edo);
+		const playerOneName = DisplayController.modal.playerOneNameField.value;
+		const playerTwoName = DisplayController.modal.playerTwoNameField.value;
+		const playerOneMark = DisplayController.modal.playerOneMarkField.value;
+		const playerTwoMark = DisplayController.modal.playerTwoMarkField.value;
+
+		const newPlayerOne = Player(playerOneName, playerOneMark);
+		const newPlayerTwo = Player(playerTwoName, playerTwoMark);
+
+		players.push(newPlayerOne, newPlayerTwo);
+
+		startGame();
 
 	}
 
 	function startGame() {
-
-		// Players initialization
-		getPlayers();
 
 		currentPlayer = players[1];
 		updateCurrentPlayer();
@@ -58,7 +64,7 @@ const GameController = (function () {
 		DisplayController.boardFunctions.createUIBoard();
 
 		if(document.getElementById("start-game-btn")){
-			DisplayController.DOMElements.body.removeChild(DisplayController.DOMElements.startButton);
+			DisplayController.DOMElements.body.removeChild(DisplayController.DOMElements.playButton);
 		}
 		
 	}
@@ -190,14 +196,13 @@ const GameController = (function () {
 
 	function resetGameData() {
 
-		players = [];
 		winner = undefined;
 		turnCount = 0;
 
 	}
 
 
-	return { startGame, playTurn, restart };
+	return { getPlayers, startGame, playTurn, restart };
 })();
 
 
@@ -206,10 +211,27 @@ const DisplayController = (function () {
 	// User Interface References
 	const body = document.querySelector("body");
 	let boardContainer;
+	
+	// Dialog references
+	const newPlayersModal = document.querySelector("dialog");
+	const newPlayersForm = document.querySelector("dialog > form")
+	const playerOneNameField = document.querySelector("#player-one-name");
+	const playerOneMarkField = document.querySelector("#player-one-mark");
+	const playerTwoNameField = document.querySelector("#player-two-name");
+	const playerTwoMarkField = document.querySelector("#player-two-mark");
 
-	const startButton = document.querySelector("#start-game-btn");
-	startButton.addEventListener("click", GameController.startGame);
+	const startGameButton = document.querySelector("#load-players-btn");
+	startGameButton.addEventListener("mousedown", () => {
+		GameController.getPlayers();
+		newPlayersModal.close();
+		newPlayersForm.reset();
+	})
 
+	const playButton = document.querySelector("#start-game-btn");
+	playButton.addEventListener("click",() => newPlayersModal.showModal());
+
+
+	
 	const turnTracker = document.createElement("p");
 	turnTracker.id = "turn-tracker";
 
@@ -307,23 +329,28 @@ const DisplayController = (function () {
 	}
 
 	function showRestartButton() {
+
 		const restartButton = document.createElement("button")
 		restartButton.id = "restart-btn";
 		restartButton.textContent = "New Game?";
 		restartButton.addEventListener("mousedown", GameController.restart);
 		body.appendChild(restartButton);
+
 	}
 
 	function resetUIBoard() {
+
 		body.removeChild(boardContainer);
 		body.removeChild(document.querySelector("#result-text"));
 		body.removeChild(document.querySelector("#restart-btn"));
+
 		
 	}
 
-	return { DOMElements: {body, startButton, turnTracker},
+	return { DOMElements: {body, playButton, turnTracker},
 			 boardFunctions: {createUIBoard, updateUIBoard, disableUIBoard, enableUIBoard, resetUIBoard},
-			 displayFunctions: {displayWinner, displayTie, showRestartButton}  };
+			 displayFunctions: {displayWinner, displayTie, showRestartButton},
+			 modal: {newPlayersModal, playerOneNameField, playerOneMarkField, playerTwoNameField, playerTwoMarkField, startGameButton}  };
 })();
 
 function Player(name, mark){
