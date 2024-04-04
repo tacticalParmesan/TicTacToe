@@ -1,20 +1,97 @@
-dialog[open] {
-    display: flex;
-    flex-direction: column;
+dialog {
+	display: flex;
+	flex-direction: column;
 
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+	opacity: 0;
+	transform: scale(0);
 
-    padding: 1rem;
+	transition: 0.4s ease;
+	align-self: center;
+	justify-self: center;
+
+	border-radius: 1rem;
+	background-color: rgb(72, 55, 74);
 }
 
-dialog[open] form{
-    margin-top: 1rem;
-    margin-bottom: 1rem;
+dialog[open] {
+	display: flex;
+	flex-direction: column;
 
-    display: flex;
-    flex-direction: column;
-    gap: 6px
+	transform: scale(1);
+	transition: 0.4s;
+
+	padding: 2rem;
+	min-width: 500px;
+
+	opacity: 1;
+}
+
+dialog[open] form {
+	margin-top: 1rem;
+	margin-bottom: 1rem;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+
+	gap: 6px;
+}
+
+.player-row {
+	display: flex;
+	justify-content: space-between;
+	gap: 10px;
+	width: 100%;
+}
+
+.player-choices {
+	display: flex;
+	justify-content: flex-end;
+
+	gap: 5px;
+}
+
+.buttons-row {
+	display: flex;
+	justify-content: flex-end;
+	gap: 15px;
+}
+
+dialog button {
+	padding: 0.4rem;
+	border: none;
+	border-radius: 0.5rem;
+
+	font-weight: 700;
+	cursor: pointer;
+}
+
+dialog p,
+dialog label {
+	font-weight: 700;
+	color: var(--xanthous);
+}
+
+#load-players-btn {
+	background-color: #206d54;
+	color: white;
+}
+
+#close-modal-btn {
+    background-color: var(--chili-red);
+}
+
+dialog input {
+    appearance: none;
+}
+
+dialog input[type=text] {
+    border: none;
+    width: 250px;
+    border-radius: 0.5rem;
+}
+
+dialog select {
+    border-radius: 0.5rem;
 }

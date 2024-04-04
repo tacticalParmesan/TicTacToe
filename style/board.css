@@ -1,0 +1,24 @@
+.board-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.board-spot {
+    height: 8rem;
+    width: 8rem;
+    background-color: rgb(172, 172, 172);
+
+    cursor: pointer;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-weight: 700;
+    font-size: 4rem;
+
+    border: none;
+    border-radius: 0.5rem;
+}
