@@ -1,8 +1,14 @@
 .board-container {
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
     gap: 1rem;
+
+    align-self: center;
+    justify-self: center;
 }
 
 .board-spot {
@@ -21,4 +27,67 @@
 
     border: none;
     border-radius: 0.5rem;
+
+    box-shadow: 0 4px 0 5px rgb(130, 130, 130);
+    transition: 0.2s;
+}
+
+.board-spot:hover {
+    background-color: rgb(200, 200, 200);
+    cursor: crosshair;    
+}
+
+
+#turn-tracker, #result-text {
+    grid-column: 1 / 4;
+
+    align-self: center;
+    justify-self: center;
+
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--xanthous);
+
+    margin-top: 1.5rem;
+}
+
+#restart-btn {
+    margin-top: 1rem;
+
+    padding: 0.8rem;
+	border: none;
+	border-radius: 0.5rem;
+
+	font-weight: 700;
+	cursor: pointer;
+    transition: 0.4s ease;
+
+    background-color: var(--xanthous);
+}
+
+#restart-btn:hover {
+    background-color: var(--vanilla);
+}
+
+.player-tab{
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-content: center;
+    text-align: center;
+
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--vanilla);
+}
+
+.player-tab.player-one {
+    grid-column: 1 / 2;
+    grid-row: 2 / 3;
+}
+
+.player-tab.player-two {
+    grid-column: 3 / 4;
+    grid-row: 2 / 3;
 }

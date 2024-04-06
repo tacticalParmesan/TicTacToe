@@ -8,6 +8,7 @@
     --vanilla: #fcf6b1ff;
     --xanthous: #f7b32bff;
     --dark-purple: #2d1e2fff;
+    --selected-mark: "E";
 }
 
 * {
@@ -34,27 +35,41 @@ body {
     background-color: var(--dark-purple);
 }
 
-header, main {
+header {
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-header {
-    position: fixed;
-    top: 1rem;
-}
-
 main {
-    flex-direction: column;
+    min-width: 100vw;
+    min-height: 100%;
+
+    display: grid;
+    grid-template-rows: 200px 1fr 150px;
+    grid-template-columns: 1fr 2fr 1fr;
+    grid-auto-flow: 0px 0px;
 }
 
 #title {
+    grid-column: 1/ 4;
+    grid-row: 1 / 2;
+    
+    align-self: center;
+    justify-self: center;
+
     font-size: 2rem;
     color: var(--xanthous);
+
+    margin-top: 1rem;
+    margin-bottom: auto;
 }
 
 #start-game-btn {
+    position: fixed;
+    align-self: center;
+    justify-self: center;
+
     padding: 1rem 1.5rem;
 
     background-color: var(--xanthous);

@@ -55,6 +55,7 @@ const GameController = (function () {
 		// Gameboard initialization
 		createLogicBoard();
 		DisplayController.boardFunctions.createUIBoard();
+		DisplayController.displayFunctions.createPlayerTabs();
 
 		if (document.getElementById("start-game-btn")) {
 			DisplayController.DOMElements.mainElement
@@ -250,6 +251,41 @@ const DisplayController = (function () {
 		loadClickListeners();
 	}
 
+	function createPlayerTabs() {
+
+		for(let i = 0; i < 2; i++){
+
+			const playerName = document.createElement("p");
+			const playerMark = document.createElement("p");
+
+			const playerTab = document.createElement("div");
+			playerTab.classList.add("player-tab");
+
+			if(i === 0) {
+				playerTab.classList.add("player-one");
+				playerName.textContent = playerOneNameField.value;
+				playerMark.textContent = playerOneMarkField.value;
+			} else {
+				playerTab.classList.add("player-two");
+				playerName.textContent = playerTwoNameField.value;
+				playerMark.textContent = playerTwoMarkField.value;
+			}
+
+			const playerScoreText = document.createElement("p");
+			playerScoreText.textContent = "Score";
+			const playerScoreNum = document.createElement("p");
+			playerScoreNum.textContent = 0;
+
+			playerTab.appendChild(playerName);
+			playerTab.appendChild(playerMark);
+			playerTab.appendChild(playerScoreText);
+			playerTab.appendChild(playerScoreNum);
+
+			mainElement.appendChild(playerTab);
+
+		}
+	}
+
 	function loadClickListeners() {
 		// As per point 4 of the createUIBoard function
 
@@ -335,7 +371,7 @@ const DisplayController = (function () {
 			enableUIBoard,
 			resetUIBoard,
 		},
-		displayFunctions: { displayWinner, displayTie, showRestartButton },
+		displayFunctions: { displayWinner, displayTie, showRestartButton, createPlayerTabs },
 		modal: {
 			newPlayersModal,
 			playerOneNameField,
