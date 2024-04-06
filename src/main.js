@@ -33,7 +33,7 @@ const GameController = (function () {
 	let currentPlayer = {};
 	let turnCount = 0;
 
-	function getPlayers() {
+	function initPlayers() {
 		const playerOneName = DisplayController.modal.playerOneNameField.value;
 		const playerTwoName = DisplayController.modal.playerTwoNameField.value;
 		const playerOneMark = DisplayController.modal.playerOneMarkField.value;
@@ -44,6 +44,7 @@ const GameController = (function () {
 
 		players.push(newPlayerOne, newPlayerTwo);
 
+		DisplayController.displayFunctions.createPlayerTabs();
 		startGame();
 	}
 
@@ -55,7 +56,6 @@ const GameController = (function () {
 		// Gameboard initialization
 		createLogicBoard();
 		DisplayController.boardFunctions.createUIBoard();
-		DisplayController.displayFunctions.createPlayerTabs();
 
 		if (document.getElementById("start-game-btn")) {
 			DisplayController.DOMElements.mainElement
@@ -87,8 +87,19 @@ const GameController = (function () {
 	function updateCurrentPlayer() {
 		// Changes the current player and updates the display text
 		currentPlayer = currentPlayer === players[0] ? players[1] : players[0];
-		DisplayController.DOMElements.turnTracker.textContent =
-			"It's " + currentPlayer.name + "'s turn!";
+		
+		let currentPlayerTab = (currentPlayer === players[0]) 
+			? document.querySelector(".player-tab.player-one")
+			: document.querySelector(".player-tab.player-two");
+
+		let otherPlayerTab = (currentPlayer === players[0]) 
+		? document.querySelector(".player-tab.player-two")
+		: document.querySelector(".player-tab.player-one");
+
+		currentPlayerTab.classList.add("current");
+		otherPlayerTab.classList.remove("current");
+
+		DisplayController.DOMElements.turnTracker.textContent = "It's " + currentPlayer.name + "'s turn!";
 	}
 
 	function checkWinner() {
@@ -100,7 +111,7 @@ const GameController = (function () {
 			for (const row of board) {
 				if (row[0] === row[1] && row[1] === row[2] && row[0] !== null) {
 					winner =
-						row[0] === players[0].mark ? players[0].name : players[1].name;
+						row[0] === players[0].mark ? players[0] : players[1];
 				}
 			}
 		}
@@ -113,7 +124,7 @@ const GameController = (function () {
 					board[0][i] !== null
 				) {
 					winner =
-						board[0][i] === players[0].mark ? players[0].name : players[1].name;
+						board[0][i] === players[0].mark ? players[0] : players[1];
 				}
 			}
 		}
@@ -128,7 +139,7 @@ const GameController = (function () {
 					board[1][1] !== null)
 			) {
 				winner =
-					board[1][1] === players[0].mark ? players[0].name : players[1].name;
+					board[1][1] === players[0].mark ? players[0]: players[1];
 			}
 		}
 
@@ -159,17 +170,20 @@ const GameController = (function () {
 		DisplayController.boardFunctions.disableUIBoard();
 
 		// 2 | Deletes the turn tracking text
-		DisplayController.DOMElements.mainElement
-.removeChild(
+		DisplayController.DOMElements.mainElement.removeChild(
 			DisplayController.DOMElements.turnTracker
 		);
 
 		// 3 | Displays the winner of the game
 		if (winner) {
-			DisplayController.displayFunctions.displayWinner(winner);
+			DisplayController.displayFunctions.displayWinner(winner.name);
+			winner.addScore();
 		} else {
 			DisplayController.displayFunctions.displayTie("It's a tie!");
 		}
+
+		// 3.5 Update the score
+		DisplayController.displayFunctions.updateScore();
 
 		// 4 | Shows result and button for restart
 		DisplayController.displayFunctions.showRestartButton(); // TODO
@@ -187,13 +201,18 @@ const GameController = (function () {
 		turnCount = 0;
 	}
 
-	return { getPlayers, startGame, playTurn, restart };
+	function getPlayers() {
+		return players;
+	}
+
+	return { initPlayers, startGame, playTurn, restart, getPlayers };
 })();
 
 const DisplayController = (function () {
 	// User Interface References
 	const mainElement = document.querySelector("main");
 	let boardContainer;
+	let resultsArea;
 
 	// Dialog references
 	const newPlayersModal = document.querySelector("dialog");
@@ -205,7 +224,7 @@ const DisplayController = (function () {
 
 	const startGameButton = document.querySelector("#load-players-btn");
 	startGameButton.addEventListener("mousedown", () => {
-		GameController.getPlayers();
+		GameController.initPlayers();
 		newPlayersModal.close();
 		newPlayersForm.reset();
 	});
@@ -242,9 +261,9 @@ const DisplayController = (function () {
 
 		// 3 | Appends the newly created spots to the grid and stores them in the NodeList
 		mainElement
-.appendChild(boardContainer);
+		.appendChild(boardContainer);
 		mainElement
-.appendChild(turnTracker);
+		.appendChild(turnTracker);
 		boardUIArray = document.querySelectorAll(".board-spot");
 
 		// 4 | Loops over the NodeList to attach to each an event listener that reads the spot's coordinates to interact with the logic board
@@ -260,21 +279,24 @@ const DisplayController = (function () {
 
 			const playerTab = document.createElement("div");
 			playerTab.classList.add("player-tab");
+			
+			const playerScoreText = document.createElement("p");
+			playerScoreText.textContent = "Score";
+			
+			const playerScoreNum = document.createElement("p");
+			playerScoreNum.textContent = 0;
 
 			if(i === 0) {
 				playerTab.classList.add("player-one");
+				playerScoreNum.classList.add("player-one-score")
 				playerName.textContent = playerOneNameField.value;
 				playerMark.textContent = playerOneMarkField.value;
 			} else {
 				playerTab.classList.add("player-two");
+				playerScoreNum.classList.add("player-two-score")
 				playerName.textContent = playerTwoNameField.value;
 				playerMark.textContent = playerTwoMarkField.value;
 			}
-
-			const playerScoreText = document.createElement("p");
-			playerScoreText.textContent = "Score";
-			const playerScoreNum = document.createElement("p");
-			playerScoreNum.textContent = 0;
 
 			playerTab.appendChild(playerName);
 			playerTab.appendChild(playerMark);
@@ -284,6 +306,15 @@ const DisplayController = (function () {
 			mainElement.appendChild(playerTab);
 
 		}
+	}
+
+	function updateScore() {
+		const displayedScoreOne = document.querySelector(".player-one-score");
+		const displayedScoreTwo = document.querySelector(".player-two-score");
+
+		displayedScoreOne.textContent = GameController.getPlayers()[0].getScore();
+		displayedScoreTwo.textContent = GameController.getPlayers()[1].getScore();
+
 	}
 
 	function loadClickListeners() {
@@ -362,8 +393,10 @@ const DisplayController = (function () {
 	}
 
 	return {
-		DOMElements: { mainElement
-	, playButton, turnTracker },
+		DOMElements: { 
+			mainElement,
+		    playButton,
+			turnTracker },
 		boardFunctions: {
 			createUIBoard,
 			updateUIBoard,
@@ -371,7 +404,7 @@ const DisplayController = (function () {
 			enableUIBoard,
 			resetUIBoard,
 		},
-		displayFunctions: { displayWinner, displayTie, showRestartButton, createPlayerTabs },
+		displayFunctions: { displayWinner, displayTie, showRestartButton, createPlayerTabs, updateScore },
 		modal: {
 			newPlayersModal,
 			playerOneNameField,
@@ -384,9 +417,19 @@ const DisplayController = (function () {
 })();
 
 function Player(name, mark) {
+	let score = 0;
+
 	function placeMark(mark, row, column) {
 		Gameboard.updateBoard(mark, row, column);
 	}
 
-	return { name, mark, placeMark };
+	function addScore() {
+		score++;
+	}
+
+	function getScore() {
+		return score;
+	}
+
+	return { name, mark, addScore, getScore, placeMark };
 }

@@ -12,7 +12,7 @@ dialog {
     border: none;
 	border-radius: 1rem;
 	background-color: rgb(72, 55, 74);
-    box-shadow: 0 0 40px 12px hsla(40, 93%, 57%, 0.200);
+    box-shadow: 0 0 40px 10px hsla(40, 93%, 57%, 0.200);
 }
 
 dialog[open] {
